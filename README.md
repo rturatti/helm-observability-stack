@@ -93,8 +93,14 @@ helm install obs . \
   --create-namespace \
   --kube-context kind-observability-local \
   -f values.yaml \
-  -f values-kind.yaml \
   --set global.adminPassword=admin123 \
+  --set grafana.service.type=NodePort \
+  --set grafana.service.nodePort=30000 \
+  --set prometheus.server.service.type=NodePort \
+  --set prometheus.server.service.nodePort=30001 \
+  --set grafana.persistence.size=1Gi \
+  --set loki.singleBinary.persistence.size=2Gi \
+  --set prometheus.server.persistentVolume.size=2Gi \
   --timeout 15m \
   --wait
 ```
@@ -115,7 +121,6 @@ helm-observability-stack/
 ├── Chart.yaml              # Declara as 5 dependências
 ├── Chart.lock              # Versões travadas (reproduzível)
 ├── values.yaml             # Configuração base (produção)
-├── values-kind.yaml        # Overrides para Kind local (NodePort, PVCs menores)
 ├── README.md
 └── templates/
     ├── _helpers.tpl                # URLs de serviço, labels, nomes
