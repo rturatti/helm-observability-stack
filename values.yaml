@@ -187,6 +187,19 @@ loki:
   gateway:
     enabled: false
 
+  # Registry completo para clusters com "short name mode" habilitado
+  # (ex: OpenShift, clusters corporativos que rejeitam nomes sem docker.io/).
+  # O chart usa "memcached" e "prom/memcached-exporter" por padrão (nomes curtos).
+  memcached:
+    image:
+      repository: docker.io/library/memcached
+      tag: 1.6.39-alpine
+
+  memcachedExporter:
+    image:
+      repository: docker.io/prom/memcached-exporter
+      tag: v0.15.4
+
 # ── Promtail ──────────────────────────────────────────────────
 # Chart: grafana/promtail 6.17.1 — Promtail 3.5.1
 # DaemonSet que coleta logs de todos os pods e envia para o Loki.
