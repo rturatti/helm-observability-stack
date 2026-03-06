@@ -1,0 +1,93 @@
+# values-kind.yaml — Overrides para ambiente Kind local
+# Uso: helm install obs . -f values.yaml -f values-kind.yaml
+#
+# Sobrescreve apenas o que é diferente do values.yaml base:
+#   - NodePort para acesso direto via localhost (sem ingress)
+#   - PVCs menores (ambiente local)
+#   - Recursos reduzidos
+
+grafana:
+  service:
+    type: NodePort
+    port: 80
+    nodePort: 30000
+
+  persistence:
+    size: 1Gi
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 300m
+      memory: 256Mi
+
+loki:
+  singleBinary:
+    persistence:
+      size: 2Gi
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 300m
+        memory: 512Mi
+
+promtail:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+
+tempo:
+  tempo:
+    persistence:
+      enabled: false
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
+
+prometheus:
+  server:
+    service:
+      type: NodePort
+      nodePort: 30001
+    persistentVolume:
+      size: 2Gi
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+
+  alertmanager:
+    enabled: false
+
+  kube-state-metrics:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
+        cpu: 100m
+        memory: 64Mi
+
+  prometheus-node-exporter:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
+        cpu: 100m
+        memory: 64Mi

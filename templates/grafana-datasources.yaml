@@ -1,0 +1,66 @@
+{{- if .Values.grafana.enabled }}
+{{/*
+  ConfigMap de datasources carregado automaticamente pelo sidecar do Grafana.
+  Usa os helpers para compor as URLs corretas baseadas no .Release.Name.
+
+  NOTA: O chart grafana/loki (6.x) NÃO cria datasource automaticamente,
+  diferente do deprecated loki-stack. Por isso, o Loki é adicionado aqui.
+  O UID "loki" é usado como referência cross-datasource (Tempo → Loki).
+*/}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "observability.fullname" . }}-datasources
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "observability.labels" . | nindent 4 }}
+    grafana_datasource: "1"
+data:
+  datasources.yaml: |
+    apiVersion: 1
+    datasources:
+      {{- if .Values.loki.enabled }}
+      - name: Loki
+        type: loki
+        uid: loki
+        access: proxy
+        url: {{ include "observability.lokiUrl" . }}
+        isDefault: true
+        editable: true
+        jsonData:
+          maxLines: 5000
+      {{- end }}
+
+      {{- if .Values.prometheus.enabled }}
+      - name: Prometheus
+        type: prometheus
+        uid: prometheus
+        access: proxy
+        url: {{ include "observability.prometheusUrl" . }}
+        editable: true
+        jsonData:
+          timeInterval: "15s"
+          httpMethod: "POST"
+      {{- end }}
+
+      {{- if .Values.tempo.enabled }}
+      - name: Tempo
+        type: tempo
+        uid: tempo
+        access: proxy
+        url: {{ include "observability.tempoUrl" . }}
+        editable: true
+        jsonData:
+          httpMethod: "GET"
+          tracesToLogsV2:
+            datasourceUid: loki
+            spanStartTimeShift: "-1h"
+            spanEndTimeShift: "1h"
+          lokiSearch:
+            datasourceUid: loki
+          {{- if .Values.prometheus.enabled }}
+          serviceMap:
+            datasourceUid: prometheus
+          {{- end }}
+      {{- end }}
+{{- end }}

@@ -1,0 +1,37 @@
+apiVersion: v2
+name: observability
+description: |
+  Umbrella chart - Stack completa de observabilidade.
+  Instala Grafana, Loki, Tempo e Prometheus com um único helm install.
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+
+maintainers:
+  - name: Platform Team
+
+dependencies:
+  - name: grafana
+    version: "10.5.15"
+    repository: https://grafana.github.io/helm-charts
+    condition: grafana.enabled
+
+  - name: loki
+    version: "6.53.0"
+    repository: https://grafana.github.io/helm-charts
+    condition: loki.enabled
+
+  - name: promtail
+    version: "6.17.1"
+    repository: https://grafana.github.io/helm-charts
+    condition: promtail.enabled
+
+  - name: tempo
+    version: "1.24.4"
+    repository: https://grafana.github.io/helm-charts
+    condition: tempo.enabled
+
+  - name: prometheus
+    version: "28.13.0"
+    repository: https://prometheus-community.github.io/helm-charts
+    condition: prometheus.enabled

@@ -1,0 +1,42 @@
+╔══════════════════════════════════════════════════════════╗
+║   Stack de Observabilidade instalada com sucesso!        ║
+╚══════════════════════════════════════════════════════════╝
+
+Componentes instalados:
+{{- if .Values.grafana.enabled }}
+  ✓ Grafana      (visualização)
+{{- end }}
+{{- if (index .Values "loki-stack").enabled }}
+  ✓ Loki Stack   (logs + coleta via Promtail)
+{{- end }}
+{{- if .Values.tempo.enabled }}
+  ✓ Tempo        (traces distribuídos)
+{{- end }}
+{{- if .Values.prometheus.enabled }}
+  ✓ Prometheus   (métricas)
+{{- end }}
+
+━━━ Acesso ao Grafana ━━━
+
+  kubectl port-forward -n {{ .Release.Namespace }} svc/{{ .Release.Name }}-grafana 3000:80
+  http://localhost:3000   →  admin / <senha definida>
+
+  Recuperar a senha gerada automaticamente:
+  kubectl get secret -n {{ .Release.Namespace }} grafana-admin-secret \
+    -o jsonpath="{.data.admin-password}" | base64 -d && echo
+
+━━━ Acesso ao Prometheus ━━━
+
+  kubectl port-forward -n {{ .Release.Namespace }} svc/{{ .Release.Name }}-prometheus-server 9090:80
+  http://localhost:9090
+
+━━━ Datasources configurados ━━━
+
+  Loki:       {{ include "observability.lokiUrl" . }}
+  Prometheus: {{ include "observability.prometheusUrl" . }}
+  Tempo:      {{ include "observability.tempoUrl" . }}
+
+━━━ Verificar status ━━━
+
+  kubectl get pods -n {{ .Release.Namespace }}
+  helm status {{ .Release.Name }} -n {{ .Release.Namespace }}

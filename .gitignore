@@ -1,0 +1,9 @@
+# Dependências baixadas pelo helm dependency update
+# NÃO commitar: são arquivos binários regeneráveis.
+# Execute: helm dependency update
+charts/*.tgz
+charts/
+
+# Arquivos temporários
+*.tmp
+*.bak
